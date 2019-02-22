@@ -1,0 +1,163 @@
+<head> 
+<link rel="apple-touch-icon-precomposed" sizes="256x256" href="https://goo.gl/AjQc8G" />
+<title>Caro</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+    <!------- My ajax start here -----------> 
+        <script> 
+        function ajax(url,id,eval_str){
+        if(document.getElementById){var x=(window.ActiveXObject)?new ActiveXObject("Microsoft.XMLHTTP"):new XMLHttpRequest();}
+        if(x){x.onreadystatechange=function() {
+        el=document.getElementById(id);
+        el.innerHTML='';
+        if(x.readyState==4&&x.status==200){
+        el.innerHTML='';
+        el=document.getElementById(id);
+        el.innerHTML=x.responseText;
+        eval(eval_str);
+        }
+        }
+        x.open("GET",url,true);x.send(null);
+        }
+        }
+        </script> 
+ 
+    <!------ End ajax --------> 
+</head> 
+<style> 
+.cell {
+	width:30px;
+	height:30px;
+	text-align:center;
+}
+</style> 
+<input type=radio name=style value=1 onclick="changeStyle(this.value);" checked>Play
+<input type=radio name=style value=2 onclick="changeStyle(this.value);">Delete
+<script> 
+ 
+function initArray() {
+	var i, j;
+	var c = new Array();
+	for (i = 0; i < SIZE[0]; i++) {
+		c[i] = new Array();
+		for (j = 0; j < SIZE[1]; j++)
+			c[i][j] = 0;
+	}
+	return c;
+}
+ 
+function loadCell() {
+	var c = new Array();
+	for (i = 0; i < SIZE[0]; i++) {
+		c[i] = new Array();
+	}
+	var i, cells = document.getElementsByTagName("td");
+	for (i = 0; i < cells.length; i++) {
+		var cell = cells[i];
+		var _pos, _r, _c;
+		var r = getAttributes(cell);
+		_pos = new String(r["cell"]);
+		_r = eval(_pos.split(",")[0]);
+		_c = eval(_pos.split(",")[1]);
+		c[_r][_c] = cell;
+	}
+	
+	return c;
+}
+ 
+var SIZE = [100, 100]; // so o chieu ngang, chieu doc
+var CELL = initArray(); // mang luu diem
+var TABLE;
+var X = true; // luot danh
+var END = false;
+var HCOLOR = 'pink';
+var VIEW_LOG = false;
+ 
+var signal = new Array();
+signal[X] = '<font color="blue">O</font>';
+signal[!X] = '<font color="red">X</font>';
+//signal[X] = "?";
+//signal[!X] = "?";
+ 
+var POINT = new Array();
+POINT[X] = 1;
+POINT[!X] = 2;
+ 
+var PERSON = new Array();
+PERSON[X] = "X";
+PERSON[!X] = "Y";
+ 
+function changeStyle(v) {
+	var X = true;
+	v = eval(v);
+	switch (v) {
+		case 1:
+			signal[X] = '<font color="blue">O</font>';
+			signal[!X] = '<font color="red">X</font>';
+			break;
+		default:
+		case 2:
+			signal[X] = "";
+			signal[!X] = "";
+			break;
+	}
+}
+// ve ban co
+function drawBoard() {
+	var i, j;
+	sBoard = "<table width='3300px' height='3300px' border='0px' cellpadding=0 cellspacing=1 bgcolor=#CCCCCC>";
+	for (i = 0; i < SIZE[0]; i++) {
+		sBoard += "<tr>";
+		for (j = 0; j < SIZE[1]; j++) {
+			sBoard += "<td bgcolor=#FFFFFF class=cell cell='" + i + "," + j + "' point=0>&nbsp;</td>";
+		}
+		sBoard += "</tr>";
+	}
+	sBoard += "</table>";
+	document.write(sBoard);
+	TABLE = loadCell();
+}
+ 
+// gan su kien click va xu ly
+function addCellEvent() {
+	var cells = document.getElementsByTagName("td");
+	for (i = 0; i < cells.length; i++) {
+		cells[i].onclick = function() {
+			X = !X;
+			setPoint(this, POINT[X]);
+			this.innerHTML = signal[X];
+		}}
+ 
+}
+
+// thay doi diem cho o (khi duoc danh dau)
+function setPoint(cell, value) {
+	cell.attributes.getNamedItem("point").value = value;
+}
+ 
+// lay toan bo cac attribute cua o, tra ve mang dang dictionary
+function getAttributes(cell) {
+	var r = new Array();
+	var as = cell.attributes;
+	for (i = 0; i < as.length; i++) {
+		r[as[i].name] = as[i].value;
+	}
+	return r;
+}
+ 
+// luu cac buoc danh dau
+function log(s) {
+	var c;
+	c = document.getElementById("state").innerHTML;
+	c = (c == "") ? (c) : (c + "<br>");
+	document.getElementById("state").innerHTML = c + s;
+}
+ 
+// thong bao tuong ung sau su kien click
+function warn(s) {
+	document.getElementById("msg").innerHTML = s;
+}
+ 
+// call above written function, enjoy now
+drawBoard();
+addCellEvent();
+</script>
